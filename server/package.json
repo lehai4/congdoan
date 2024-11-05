@@ -1,0 +1,37 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "server công đoạn",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://gitlab.com/vietlonghung/congdoan.git"
+  },
+  "author": "lechihai",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://gitlab.com/vietlonghung/congdoan/issues"
+  },
+  "homepage": "https://gitlab.com/vietlonghung/congdoan#readme",
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "body-parser": "^1.20.3",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "crypto": "^1.0.1",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.1",
+    "jsonwebtoken": "^9.0.2",
+    "moment": "^2.30.1",
+    "mongodb": "^6.10.0",
+    "mongoose": "^8.8.0",
+    "mssql": "^11.0.1",
+    "mysql2": "^3.11.3",
+    "nodemon": "^3.1.7",
+    "prettier": "^3.3.3"
+  }
+}
