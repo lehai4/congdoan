@@ -19,18 +19,10 @@ function App() {
         draggable
         pauseOnHover
       />
-      <Layout
-        style={{
-          height: "100%",
-          overflow: "hidden",
-          width: "100%",
-        }}
-      >
-        <Layout className="w-full h-full max-screen flex-row items-center justify-center">
-          <div className="container">
-            <Router isAuthenticated={user ? true : false} user={user} />
-          </div>
-        </Layout>
+      <Layout className="w-full h-full max-h-screen flex flex-row items-center justify-center">
+        <div className="container">
+          <Router isAuthenticated={user ? true : false} user={user} />
+        </div>
       </Layout>
     </>
   );

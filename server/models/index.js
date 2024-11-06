@@ -8,12 +8,28 @@ const processModels = {
     );
     return rows[0];
   },
+
+  getAllMaHang: async () => {
+    try {
+      const query = `SELECT DISTINCT MaSanPham FROM DM_SanPham`;
+      const pool = await connectToDatabase();
+      const result = await pool.request().query(query);
+      return result.recordset;
+    } catch (err) {
+      console.error("Lỗi truy vấn:", err);
+      throw err;
+    } finally {
+      sql.close(); // Đóng kết nối sau khi truy vấn xong
+    }
+  },
+
   getAllStepByIdProcess: async (idProcess, page, limit) => {
     const query = `
       SELECT 
+        qtcn_ct.STT,
         sp.MaSanPham, 
         qtcn.SoPhieu AS N'quy_trinh', 
-        tg.ThuTu AS N'thoi_gian', 
+        tg.ThuTu AS N'time', 
         cdc.TenCongDoan AS N'ten_cong_doan', 
         cdc.MaCongDoan AS N'ma_cong_doan',
         cdc.CapBacCongDoan, 
@@ -41,8 +57,8 @@ const processModels = {
       WHERE 
            qtcn.SoPhieu = @quy_trinh
       ORDER BY 
-          sp.MaSanPham  -- Hoặc cột khác mà bạn muốn sắp xếp
-      OFFSET (@Offset - 1) ROWS  -- Giảm 1 để bắt đầu từ 0
+          qtcn_ct.STT  -- Hoặc cột khác mà bạn muốn sắp xếp
+      OFFSET ((@Offset - 1) * @Limit) ROWS
       FETCH NEXT @Limit ROWS ONLY;
     `;
 
@@ -65,7 +81,6 @@ const processModels = {
         .request()
         .input("quy_trinh", sql.VarChar, idProcess)
         .query(queryCount);
-
       const totalItems = totalResult.recordset[0].so_luong;
 
       const process = await pool
@@ -74,20 +89,23 @@ const processModels = {
         .input("Limit", sql.Int, limit)
         .input("quy_trinh", sql.VarChar, idProcess)
         .query(query);
+
       const totalPages = Math.ceil(totalItems / limit);
 
       return {
         process: process.recordset,
         totalPages,
         totalItems,
+        limit,
       };
     } catch (error) {
       console.error("Lỗi truy vấn:", err);
-      throw error;
+      return error;
     } finally {
       sql.close(); // Đóng kết nối sau khi truy vấn xong
     }
   },
+
   getAllProcessByIdMaHang: async (idMaHang) => {
     const query = `
     select distinct qtcn.SoPhieu as N'qui_trinh'
@@ -109,7 +127,7 @@ const processModels = {
       return result.recordset;
     } catch (error) {
       console.error("Lỗi truy vấn:", err);
-      throw error;
+      return error;
     } finally {
       sql.close(); // Đóng kết nối sau khi truy vấn xong
     }
@@ -123,7 +141,7 @@ const processModels = {
       await connection.commit();
     } catch (error) {
       await connection.rollback(); // Rollback nếu có lỗi
-      throw error;
+      return error;
     } finally {
       connection.release();
     }

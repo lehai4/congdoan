@@ -1,8 +1,6 @@
 const processModels = require("../models");
 
 const processController = {
-  //Admin
-
   addVideoIntoProcess: async (req, res) => {
     try {
       return res.status(201).json({
@@ -13,13 +11,26 @@ const processController = {
     }
   },
 
-  //admin/user
+  getAllMaHang: async (req, res) => {
+    try {
+      const arrMaHang = await processModels.getAllMaHang();
+      if (arrMaHang.length > 0) {
+        return res.status(200).json(arrMaHang);
+      } else {
+        return res
+          .status(400)
+          .json({ message: "Không tìm thấy bất kỳ mã hàng nào!" });
+      }
+    } catch (err) {
+      return res.status(500).json({ message: "Server 500 internal" });
+    }
+  },
 
   getAllStepByIdProcess: async (req, res) => {
     try {
       const { idProcess } = req.params;
       const page = parseInt(req.query.page) || 1;
-      const limit = parseInt(req.query.limit) || 10;
+      const limit = parseInt(req.query.limit) || 50;
 
       const result = await processModels.getAllStepByIdProcess(
         idProcess,
@@ -32,7 +43,8 @@ const processController = {
         currentPage: page,
         totalPages: result.totalPages,
         totalItems: result.totalItems,
-        messages: "Lấy thành công công đoạn!",
+        limit: result.limit,
+        messages: "Lấy thành công tất cả công đoạn!",
       });
     } catch (err) {
       return res
@@ -40,20 +52,20 @@ const processController = {
         .json({ message: "Server 500 internal!", error: err.message });
     }
   },
+
   getAllProcessByIdMaHang: async (req, res) => {
     try {
       const { idMaHang } = req.params;
-
       const result = await processModels.getAllProcessByIdMaHang(idMaHang);
       if (result.length > 0) {
         return res.status(200).json({
-          message: "Lấy mã hàng thành công!",
+          message: "Lấy qui trình thành công!",
           success: true,
           result,
         });
       }
       return res.status(400).json({
-        message: "Mã hàng không tồn tại!",
+        message: "Không tìm thấy quy trình!",
         success: false,
       });
     } catch (err) {

@@ -3,6 +3,8 @@ const router = express.Router();
 const processController = require("../controller/controller_process");
 const middleWare = require("../middleware/middleware");
 
+router.get("/getAllMaHang", processController.getAllMaHang);
+
 router.get(
   "/getAllProcessByIdMaHang/:idMaHang",
   processController.getAllProcessByIdMaHang

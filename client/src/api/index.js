@@ -21,12 +21,29 @@ export const http = {
     }
   },
 
-  getProcessByIdMaHang: async (idMaHang) => {
+  getAllMaHang: async () => {
     try {
-      console.log(idMaHang);
       const res = await axios({
         method: "GET",
-        url: `${envConfig.VITE_API_ENDPOINT}/user/process/getAllProcessByIdMaHang/${idMaHang}`,
+        url: `${envConfig.VITE_API_ENDPOINT}/admin/process/getAllMaHang`,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      return res;
+    } catch (err) {
+      return err.response;
+    }
+  },
+  getAllProcessByIdMaHang: async (idMaHang) => {
+    try {
+      const res = await axios({
+        method: "GET",
+        url: `${
+          envConfig.VITE_API_ENDPOINT
+        }/admin/process/getAllProcessByIdMaHang/${encodeURIComponent(
+          idMaHang
+        )}`,
         headers: {
           "Content-Type": "application/json",
         },
@@ -37,11 +54,11 @@ export const http = {
     }
   },
 
-  getAllStepByIdProcess: async (idQuiTrinh) => {
+  getAllStepByIdProcess: async (idQuiTrinh, page) => {
     try {
       const res = await axios({
         method: "GET",
-        url: `${envConfig.VITE_API_ENDPOINT}/admin/process/getAllStepByIdProcess/${idQuiTrinh}`,
+        url: `${envConfig.VITE_API_ENDPOINT}/admin/process/getAllStepByIdProcess/${idQuiTrinh}?page=${page}&limit=50`,
         headers: {
           "Content-Type": "application/json",
         },
