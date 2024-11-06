@@ -19,11 +19,9 @@ function App() {
         draggable
         pauseOnHover
       />
-      <Layout className="w-full h-full max-h-screen flex flex-row items-center justify-center">
-        <div className="container">
-          <Router isAuthenticated={user ? true : false} user={user} />
-        </div>
-      </Layout>
+      <div className="h-full max-h-screen">
+        <Router isAuthenticated={user ? true : false} user={user} />
+      </div>
     </>
   );
 }

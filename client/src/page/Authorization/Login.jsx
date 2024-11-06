@@ -42,8 +42,9 @@ const Login = () => {
     errors,
   };
   return (
-    <div className="flex flex-col items-center border rounded-md p-10 shadow-lg">
+    <div className="w-[400px] h-[600px] flex flex-col justify-center items-center border rounded-lg p-10 shadow-lg gap-5">
       <Logo />
+      <h1 className="font-[500] text-[30px]">Đăng nhập</h1>
       <Form {...retryProps} />
     </div>
   );

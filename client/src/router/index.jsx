@@ -3,6 +3,8 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import ProtectedRoute from "../hooks/ProtectedRouter";
 import Login from "../page/Authorization/Login";
 import HomePage from "../page/Home";
+import LayoutContent from "../components/Layout";
+import Library from "../page/Library";
 
 const Router = ({ isAuthenticated, user }) => {
   const token = localStorage.getItem("token");
@@ -10,7 +12,7 @@ const Router = ({ isAuthenticated, user }) => {
   return (
     <Routes>
       {token ? (
-        <>
+        <Route path="/" element={<LayoutContent />}>
           {user.role === "admin" && (
             <>
               <Route
@@ -21,11 +23,12 @@ const Router = ({ isAuthenticated, user }) => {
                   </ProtectedRoute>
                 }
               />
+              <Route path="/library" element={<Library />} />
               <Route path="/login" element={<Login />} />
               <Route path="*" element={<Navigate to="/" />} />
             </>
           )}
-          {user.role === "user" && (
+          {/* {user.role === "user" && (
             <>
               <Route
                 path="/"
@@ -38,10 +41,18 @@ const Router = ({ isAuthenticated, user }) => {
               <Route path="/login" element={<Login />} />
               <Route path="*" element={<Navigate to="/" />} />
             </>
-          )}
-        </>
+          )} */}
+        </Route>
       ) : (
         <>
+          <Route
+            path="/"
+            element={
+              <ProtectedRoute isAuthenticated={isAuthenticated}>
+                <Login />
+              </ProtectedRoute>
+            }
+          />
           <Route path="login" element={<Login />} />
           <Route path="*" element={<Navigate to="login" />} />
         </>

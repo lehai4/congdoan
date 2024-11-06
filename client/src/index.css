@@ -22,6 +22,7 @@ body {
   box-sizing: border-box;
   scroll-behavior: smooth;
   overflow-x: clip;
+  margin: 0 auto;
 }
 
 #root {
@@ -80,4 +81,8 @@ thead th {
 
 .upload-btn:hover {
   background-color: #0056b3;
+}
+//override
+.ant-table-cell {
+  white-space: nowrap; /* Đảm bảo nội dung không xuống dòng */
 }
