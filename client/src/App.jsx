@@ -19,7 +19,7 @@ function App() {
         draggable
         pauseOnHover
       />
-      <div className="h-full max-h-screen">
+      <div className="h-full max-h-screen overflow-auto">
         <Router isAuthenticated={user ? true : false} user={user} />
       </div>
     </>

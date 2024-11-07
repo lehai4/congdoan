@@ -36,6 +36,21 @@ export const http = {
     }
   },
 
+  getAllProcessIsSaveLink: async () => {
+    try {
+      const res = await axios({
+        method: "GET",
+        url: `${envConfig.VITE_API_ENDPOINT}/admin/process/getAllProcessIsSaveLink`,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      return res;
+    } catch (err) {
+      return err.response;
+    }
+  },
+
   getAllProcessByIdMaHang: async (idMaHang) => {
     try {
       const res = await axios({
@@ -63,6 +78,39 @@ export const http = {
         headers: {
           "Content-Type": "application/json",
         },
+      });
+      return res;
+    } catch (err) {
+      return err.response;
+    }
+  },
+
+  uploadProcess: async (token, data) => {
+    try {
+      const res = await axios({
+        method: "POST",
+        url: `${envConfig.VITE_API_ENDPOINT}/admin/process/uploadProcessToDataBase`,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + token,
+        },
+        data,
+      });
+      return res;
+    } catch (err) {
+      return err.response;
+    }
+  },
+  addProcessIsSaveLink: async (token, data) => {
+    try {
+      const res = await axios({
+        method: "POST",
+        url: `${envConfig.VITE_API_ENDPOINT}/admin/process/addProcessIsSaveLink`,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + token,
+        },
+        data,
       });
       return res;
     } catch (err) {

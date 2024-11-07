@@ -6,6 +6,11 @@ const middleWare = require("../middleware/middleware");
 router.get("/getAllMaHang", processController.getAllMaHang);
 
 router.get(
+  "/getAllProcessIsSaveLink",
+  processController.getAllProcessIsSaveLink
+);
+
+router.get(
   "/getAllProcessByIdMaHang/:idMaHang",
   processController.getAllProcessByIdMaHang
 );
@@ -15,16 +20,18 @@ router.get(
   processController.getAllStepByIdProcess
 );
 
-router.get(
-  "/getInfoStepByIdProcess/:idProcess",
-  processController.getInfoProcessByIdProcess
+router.post(
+  "/uploadProcessToDataBase",
+  middleWare.allowCors,
+  middleWare.authorized,
+  processController.uploadProcessToDataBase
 );
 
 router.post(
-  "/:id/step:stepId/video",
+  "/addProcessIsSaveLink",
   middleWare.allowCors,
   middleWare.authorized,
-  processController.addVideoIntoProcess
+  processController.addProcessIsSaveLink
 );
 
 module.exports = router;

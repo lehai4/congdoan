@@ -1,8 +1,22 @@
 const processModels = require("../models");
 
 const processController = {
-  addVideoIntoProcess: async (req, res) => {
+  addProcessIsSaveLink: async (req, res) => {
     try {
+      const data = req.body;
+      await processModels.addProcessIsSaveLink(data);
+      return res.status(201).json({
+        message: "Thêm thành công!",
+      });
+    } catch (err) {
+      return res.status(500).json({ message: "Server 500 internal!" });
+    }
+  },
+
+  uploadProcessToDataBase: async (req, res) => {
+    try {
+      const data = req.body;
+      await processModels.uploadProcessToDataBase(data);
       return res.status(201).json({
         message: "Thêm thành công!",
       });
@@ -20,6 +34,21 @@ const processController = {
         return res
           .status(400)
           .json({ message: "Không tìm thấy bất kỳ mã hàng nào!" });
+      }
+    } catch (err) {
+      return res.status(500).json({ message: "Server 500 internal" });
+    }
+  },
+
+  getAllProcessIsSaveLink: async (req, res) => {
+    try {
+      const result = await processModels.getAllProcessIsSaveLink();
+      if (result.length > 0) {
+        return res.status(200).json(result);
+      } else {
+        return res
+          .status(400)
+          .json({ message: "Không tìm thấy bất kỳ dữ liệu nào!" });
       }
     } catch (err) {
       return res.status(500).json({ message: "Server 500 internal" });

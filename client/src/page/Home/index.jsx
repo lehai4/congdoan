@@ -1,9 +1,13 @@
-import { SearchOutlined, UploadOutlined } from "@ant-design/icons";
+import {
+  SearchOutlined,
+  UploadOutlined,
+  EditOutlined,
+} from "@ant-design/icons";
 import {
   Button,
   Input,
+  Modal,
   Pagination,
-  Popconfirm,
   Select,
   Space,
   Table,
@@ -33,6 +37,10 @@ const useStyle = createStyles(({ css, token }) => {
 });
 
 const HomePage = () => {
+  const user = localStorage.getItem("user");
+  const token = localStorage.getItem("token");
+  const userParse = JSON.parse(user);
+
   const { styles } = useStyle();
   const [query, setQuery] = useState({
     ma_hang: null,
@@ -58,6 +66,56 @@ const HomePage = () => {
   const [searchedColumn, setSearchedColumn] = useState("");
   const searchInput = useRef(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [dataModal, setDataModal] = useState(null);
+  const [link, setLink] = useState(null);
+  const [isValidProcess, setIsValidProcess] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [isType, setIsType] = useState(null);
+  const showModal = (data) => {
+    setDataModal(data);
+    setIsModalOpen(true);
+  };
+
+  const handleAddLinkVideo = async () => {
+    if (!link) {
+      toast.info("Vui lòng thêm link.!");
+      return;
+    }
+    try {
+      const data = {
+        ...dataModal,
+        video: link,
+      };
+      const saveStore = {
+        ma_cong_doan: dataModal.ma_cong_doan,
+        ma_hang: dataModal.ma_hang,
+        quy_trinh: dataModal.quy_trinh,
+        stt: dataModal.stt,
+      };
+      const res = await http.uploadProcess(token, data);
+      await http.addProcessIsSaveLink(token, saveStore);
+      fetchAllProcessIsSaveLink();
+      handleShowAllProcess();
+
+      toast.success(res.data.message);
+      setIsModalOpen(false);
+      setLink(null);
+    } catch (error) {
+      toast.error(error.message);
+      console.log(error);
+    }
+  };
+
+  const handleEditLinkVideo = async () => {
+    console.log("Edit link video");
+  };
+
+  const handleCancel = () => {
+    setIsModalOpen(false);
+  };
+
   const handleSearch = (selectedKeys, confirm, dataIndex) => {
     confirm();
     setSearchText(selectedKeys[0]);
@@ -83,7 +141,7 @@ const HomePage = () => {
       >
         <Input
           ref={searchInput}
-          placeholder={`Search ${dataIndex}`}
+          placeholder={`${dataIndex}`}
           value={selectedKeys[0]}
           onChange={(e) =>
             setSelectedKeys(e.target.value ? [e.target.value] : [])
@@ -97,11 +155,14 @@ const HomePage = () => {
         <Space>
           <Button
             type="primary"
-            onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
-            icon={<SearchOutlined />}
             size="small"
-            style={{
-              width: 90,
+            icon={<SearchOutlined />}
+            onClick={() => {
+              confirm({
+                closeDropdown: false,
+              });
+              setSearchText(selectedKeys[0]);
+              setSearchedColumn(dataIndex);
             }}
           >
             Search
@@ -115,19 +176,7 @@ const HomePage = () => {
           >
             Reset
           </Button>
-          <Button
-            type="link"
-            size="small"
-            onClick={() => {
-              confirm({
-                closeDropdown: false,
-              });
-              setSearchText(selectedKeys[0]);
-              setSearchedColumn(dataIndex);
-            }}
-          >
-            Filter
-          </Button>
+
           <Button
             type="link"
             size="small"
@@ -208,7 +257,7 @@ const HomePage = () => {
       dataIndex: "ten_cong_doan",
       ...getColumnSearchProps("ten_cong_doan"),
       render: (ten_cong_doan) => (
-        <Typography.Text className="text-[16px] whitespace-nowrap">
+        <Typography.Text className="text-[16px]">
           {ten_cong_doan}
         </Typography.Text>
       ),
@@ -229,33 +278,42 @@ const HomePage = () => {
       ),
     },
     {
-      title: (
-        <Typography.Text className="text-[16px] whitespace-nowrap"></Typography.Text>
-      ),
+      title: <Typography.Text className="text-[16px]"></Typography.Text>,
       dataIndex: "",
       key: "x",
-      render: (e) => (
-        <Space className="gap-4">
-          <Popconfirm
-            title="Upload"
-            description={`You are sure upload "${e.name}" ?`}
-            onConfirm={() => {}}
-            onCancel={() => {}}
-            okText="Yes"
-            cancelText="No"
-            placement="bottomLeft"
-            style={{ width: 550 }}
-          >
+      render: (data) => (
+        <>
+          {isValidProcess.some(
+            (item) =>
+              item.ma_hang === data.ma_hang &&
+              item.quy_trinh === data.quy_trinh &&
+              item.ma_cong_doan === data.ma_cong_doan
+          ) ? (
+            <Button
+              type="dashed"
+              size="middle"
+              icon={<EditOutlined />}
+              onClick={() => {
+                setIsType("edit");
+                showModal(data);
+              }}
+            >
+              Edit Link
+            </Button>
+          ) : (
             <Button
               type="primary"
               size="middle"
               icon={<UploadOutlined />}
-              onClick={() => {}}
+              onClick={() => {
+                setIsType("add");
+                showModal(data);
+              }}
             >
-              Upload
+              Thêm Link
             </Button>
-          </Popconfirm>
-        </Space>
+          )}
+        </>
       ),
     },
   ];
@@ -274,6 +332,12 @@ const HomePage = () => {
     setOptionsMH(MH);
   };
 
+  const fetchAllProcessIsSaveLink = async () => {
+    const res = await http.getAllProcessIsSaveLink();
+    // console.log(res);
+    setIsValidProcess(res.data);
+  };
+
   const handleChange = (e, type) => {
     setQuery((prev) => ({
       ...prev,
@@ -282,30 +346,34 @@ const HomePage = () => {
   };
 
   const handleGetProcessByIdMaHang = async () => {
-    const res = await http.getAllProcessByIdMaHang(query.ma_hang);
-    const { data } = res;
-    if (res.status === 200) {
-      toast.success(res.data.message);
-      const quitrinh = data.result.map((d) => {
-        return {
-          value: d.qui_trinh,
-          label: d.qui_trinh,
-        };
-      });
-      setOptions(quitrinh);
-      setQuery((prev) => ({
-        ...prev,
-        ["qui_trinh"]: null,
-      }));
-      setDataSource([]);
-    } else if (res.status === 400) {
-      setOptions([]);
-      setQuery((prev) => ({
-        ...prev,
-        ["qui_trinh"]: null,
-      }));
-      setDataSource(null);
-      toast.error(res.data.message);
+    if (userParse.role === "admin") {
+      const res = await http.getAllProcessByIdMaHang(query.ma_hang);
+      const { data } = res;
+      if (res.status === 200) {
+        toast.success(res.data.message);
+        const quitrinh = data.result.map((d) => {
+          return {
+            value: d.qui_trinh,
+            label: d.qui_trinh,
+          };
+        });
+        setOptions(quitrinh);
+        setQuery((prev) => ({
+          ...prev,
+          ["qui_trinh"]: null,
+        }));
+        setDataSource([]);
+      } else if (res.status === 400) {
+        setOptions([]);
+        setQuery((prev) => ({
+          ...prev,
+          ["qui_trinh"]: null,
+        }));
+        setDataSource(null);
+        toast.error(res.data.message);
+      }
+    } else if (userParse.role === "user") {
+      console.log("running....");
     }
   };
 
@@ -360,23 +428,42 @@ const HomePage = () => {
         ma_hang: p.MaSanPham,
         ten_cong_doan: p.ten_cong_doan,
         time: p.time,
+        ten_chung_loai: p.TenChungLoai,
+        ma_cong_doan: p.ma_cong_doan,
+        ten_cum: p.TenCum,
+        ten_cum_sam: p.TenCumSAM,
+        quy_trinh: p.quy_trinh,
+        ma_cum: p.MaCum,
       };
     });
     setDataSource(data);
   }, [processArray]);
-
-  // useEffect(() => {
-  //   console.log(isLoading);
-  // }, [isLoading]);
 
   useEffect(() => {
     fetchData();
   }, [fetchData]);
 
   useEffect(() => {
-    fetchAllMaHang();
+    const fetchData = async () => {
+      try {
+        await Promise.all([fetchAllMaHang(), fetchAllProcessIsSaveLink()]);
+      } catch (err) {
+        setError(err); // Xử lý lỗi nếu có
+      } finally {
+        setLoading(false); // Đặt loading = false khi kết thúc
+      }
+    };
+
+    fetchData();
   }, []);
 
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error.message}</div>;
+  }
   return (
     <div className="flex flex-col h-full justify-center">
       <h2 className="text-[32px] font-semibold">Danh sách công đoạn</h2>
@@ -397,21 +484,23 @@ const HomePage = () => {
               onChange={(e) => handleChange(e, "ma_hang")}
             />
           </div>
-          <div className="flex flex-col gap-2">
-            <label htmlFor="qui_trinh" className="text-[16px]">
-              Qui trình công nghệ
-            </label>
-            <Select
-              size="middle"
-              showSearch
-              placeholder="Chọn một tùy chọn"
-              name="qui_trinh"
-              value={query.qui_trinh}
-              options={options}
-              className="w-full"
-              onChange={(e) => handleChange(e, "qui_trinh")}
-            />
-          </div>
+          {userParse.role === "admin" && (
+            <div className="flex flex-col gap-2">
+              <label htmlFor="qui_trinh" className="text-[16px]">
+                Qui trình công nghệ
+              </label>
+              <Select
+                size="middle"
+                showSearch
+                placeholder="Chọn một tùy chọn"
+                name="qui_trinh"
+                value={query.qui_trinh}
+                options={options}
+                className="w-full"
+                onChange={(e) => handleChange(e, "qui_trinh")}
+              />
+            </div>
+          )}
         </form>
       </div>
       <div className="my-5 border">
@@ -434,6 +523,33 @@ const HomePage = () => {
           className="items-center justify-center"
         />
       )}
+      <Modal
+        title="Link Video"
+        open={isModalOpen}
+        // onOk={handleAddLinkVideo}
+        onCancel={handleCancel}
+        footer={[
+          <Button key="link" type="default" onClick={handleCancel}>
+            Hủy
+          </Button>,
+          <Button
+            key="submit"
+            type="primary"
+            onClick={
+              isType === "add" ? handleAddLinkVideo : handleEditLinkVideo
+            }
+          >
+            {isType === "add" ? "Thêm" : "Cập nhật"}
+          </Button>,
+        ]}
+      >
+        <Input
+          type="link"
+          placeholder="Link for video"
+          value={link}
+          onChange={(e) => setLink(e.target.value)}
+        />
+      </Modal>
     </div>
   );
 };

@@ -23,6 +23,11 @@ const processModels = {
     }
   },
 
+  getAllProcessIsSaveLink: async () => {
+    const [rows] = await db.query(`SELECT * FROM pm_no_allow_cd`);
+    return rows;
+  },
+
   getAllStepByIdProcess: async (idProcess, page, limit) => {
     const query = `
       SELECT 
@@ -133,15 +138,84 @@ const processModels = {
     }
   },
 
-  getInfoProcessByIdProcess: async (idProcess) => {
+  uploadProcessToDataBase: async (data) => {
+    const paramData = {
+      stt: data.stt,
+      ma_san_pham: data.ma_hang,
+      ten_qui_trinh: data.quy_trinh,
+      thoi_gian: data.time,
+      ten_cong_doan: data.ten_cong_doan,
+      ten_chung_loai: data.ten_chung_loai,
+      ma_cong_doan: data.ma_cong_doan,
+      ten_cum_sam: data.ten_cum_sam,
+      ten_cum: data.ten_cum,
+      ma_cum: data.ma_cum,
+      video: data.video ? data.video : "",
+    };
+    const query = `
+    INSERT INTO pm_cong_doan (
+      stt,ma_san_pham,ten_qui_trinh,thoi_gian,ten_cong_doan,ten_chung_loai,ma_cong_doan,ten_cum_sam,ten_cum,ma_cum,video
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+     on duplicate key update
+      thoi_gian = VALUES(thoi_gian),
+      ten_cong_doan = VALUES(ten_cong_doan),
+      ten_chung_loai = VALUES(ten_chung_loai),
+      ten_cum_sam = VALUES(ten_cum_sam),
+      ten_cum = VALUES(ten_cum),
+      video = VALUES(video);
+  `;
+
+    // Tạo một mảng chứa các giá trị từ paramData
+    const values = [
+      paramData.stt,
+      paramData.ma_san_pham,
+      paramData.ten_qui_trinh,
+      paramData.thoi_gian,
+      paramData.ten_cong_doan,
+      paramData.ten_chung_loai,
+      paramData.ma_cong_doan,
+      paramData.ten_cum_sam,
+      paramData.ten_cum,
+      paramData.ma_cum,
+      paramData.video,
+    ];
+    // console.log(values);
     const connection = await db.getConnection();
     try {
-      await connection.beginTransaction();
-
+      await connection.beginTransaction(); //
+      await connection.query(query, values);
       await connection.commit();
     } catch (error) {
       await connection.rollback(); // Rollback nếu có lỗi
-      return error;
+      throw error;
+    } finally {
+      connection.release();
+    }
+  },
+
+  addProcessIsSaveLink: async (data) => {
+    const query = `
+    INSERT INTO pm_no_allow_cd (
+     ma_cong_doan, ma_hang, quy_trinh, stt
+    ) VALUES (?, ?, ?, ?)
+     on duplicate key update
+     ma_cong_doan = values(ma_cong_doan),
+     ma_hang = values(ma_hang),
+     quy_trinh = values(quy_trinh),
+     stt = values(stt)
+  `;
+
+    // Tạo một mảng chứa các giá trị từ paramData
+    const values = [data.ma_cong_doan, data.ma_hang, data.quy_trinh, data.stt];
+    // console.log("values của addProcessIsSaveLink", values);
+    const connection = await db.getConnection();
+    try {
+      await connection.beginTransaction(); //
+      await connection.query(query, values);
+      await connection.commit();
+    } catch (error) {
+      await connection.rollback(); // Rollback nếu có lỗi
+      throw error;
     } finally {
       connection.release();
     }

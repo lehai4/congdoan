@@ -1,7 +1,7 @@
 import { Menu } from "antd";
 import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-
+import { ControlOutlined, BookOutlined } from "@ant-design/icons";
 function getItem(label, key, icon, children, type) {
   return {
     key,
@@ -11,7 +11,9 @@ function getItem(label, key, icon, children, type) {
     type,
   };
 }
-const items = [getItem("Quản lý", "/"), getItem("Thư viện", "/library")];
+const items = [
+  getItem("Quản lý", "/", <ControlOutlined style={{ fontSize: "18px" }} />),
+];
 const Menubar = () => {
   const pathname = useLocation();
   const navigate = useNavigate();
@@ -26,7 +28,7 @@ const Menubar = () => {
       }}
       style={{
         border: "none",
-        fontSize: "16px",
+        fontSize: "18px",
       }}
     />
   );
