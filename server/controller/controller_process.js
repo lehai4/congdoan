@@ -25,6 +25,21 @@ const processController = {
     }
   },
 
+  getAllCongDoan: async (req, res) => {
+    try {
+      const congDoan = await processModels.getAllCongDoan();
+      if (congDoan.length > 0) {
+        return res.status(200).json(congDoan);
+      } else {
+        return res
+          .status(400)
+          .json({ message: "Không tìm thấy bất kỳ mã hàng nào!" });
+      }
+    } catch (err) {
+      return res.status(500).json({ message: "Server 500 internal" });
+    }
+  },
+
   getAllMaHang: async (req, res) => {
     try {
       const arrMaHang = await processModels.getAllMaHang();
@@ -114,6 +129,36 @@ const processController = {
       });
     } catch (err) {
       return res.status(500).json({ message: "Server 500 internal!" });
+    }
+  },
+
+  //USER
+  getAllCongDoanByIdMaHang: async (req, res) => {
+    try {
+      const { idMaHang } = req.params;
+      const page = parseInt(req.query.page) || 1;
+      const limit = parseInt(req.query.limit) || 50;
+
+      const result = await processModels.getAllCongDoanByIdMaHang(
+        idMaHang,
+        page,
+        limit
+      );
+      if (result.congdoans.length === 0) {
+        return res.status(404).json({
+          message: `Không tìm thấy danh sách công đoạn của mã hàng ${idMaHang}`,
+        });
+      }
+      res.status(200).json({
+        congdoans: result.congdoans,
+        currentPage: page,
+        totalPages: result.totalPages,
+        totalItems: result.totalItems,
+        limit: result.limit,
+        messages: "Lấy thành công tất cả công đoạn!",
+      });
+    } catch (err) {
+      return res.status(500).json({ message: "Server 500 internal" });
     }
   },
 };

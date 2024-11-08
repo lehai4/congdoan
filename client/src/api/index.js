@@ -21,6 +21,21 @@ export const http = {
     }
   },
 
+  getAllCongDoan: async () => {
+    try {
+      const res = await axios({
+        method: "GET",
+        url: `${envConfig.VITE_API_ENDPOINT}/admin/process/getAllCongDoan`,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      return res;
+    } catch (err) {
+      return err.response;
+    }
+  },
+
   getAllMaHang: async () => {
     try {
       const res = await axios({
@@ -74,7 +89,11 @@ export const http = {
     try {
       const res = await axios({
         method: "GET",
-        url: `${envConfig.VITE_API_ENDPOINT}/admin/process/getAllStepByIdProcess/${idQuiTrinh}?page=${page}&limit=50`,
+        url: `${
+          envConfig.VITE_API_ENDPOINT
+        }/admin/process/getAllStepByIdProcess/${encodeURIComponent(
+          idQuiTrinh
+        )}?page=${page}&limit=50`,
         headers: {
           "Content-Type": "application/json",
         },
@@ -101,6 +120,7 @@ export const http = {
       return err.response;
     }
   },
+
   addProcessIsSaveLink: async (token, data) => {
     try {
       const res = await axios({
@@ -111,6 +131,27 @@ export const http = {
           Authorization: "Bearer " + token,
         },
         data,
+      });
+      return res;
+    } catch (err) {
+      return err.response;
+    }
+  },
+
+  //user
+  getAllCongDoanByIdMaHang: async (token, idMaHang, page) => {
+    try {
+      const res = await axios({
+        method: "GET",
+        url: `${
+          envConfig.VITE_API_ENDPOINT
+        }/user/process/getAllCongDoanByIdMaHang/${encodeURIComponent(
+          idMaHang
+        )}?page=${page}&limit=50`,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + token,
+        },
       });
       return res;
     } catch (err) {

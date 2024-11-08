@@ -4,10 +4,10 @@ import ProtectedRoute from "../hooks/ProtectedRouter";
 import Login from "../page/Authorization/Login";
 import HomePage from "../page/Home";
 import LayoutContent from "../components/Layout";
+import UserPage from "../page/Home/UserPage";
 
 const Router = ({ isAuthenticated, user }) => {
   const token = localStorage.getItem("token");
-
   return (
     <Routes>
       {token ? (
@@ -17,7 +17,7 @@ const Router = ({ isAuthenticated, user }) => {
               path="/"
               element={
                 <ProtectedRoute isAuthenticated={isAuthenticated}>
-                  <HomePage />
+                  {user.role === "admin" ? <HomePage /> : <UserPage />}
                 </ProtectedRoute>
               }
             />

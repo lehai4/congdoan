@@ -9,6 +9,11 @@ const processModels = {
     return rows[0];
   },
 
+  getAllCongDoan: async () => {
+    const [rows] = await db.query(`SELECT * FROM pm_cong_doan`);
+    return rows;
+  },
+
   getAllMaHang: async () => {
     try {
       const query = `SELECT DISTINCT MaSanPham FROM DM_SanPham`;
@@ -218,6 +223,39 @@ const processModels = {
       throw error;
     } finally {
       connection.release();
+    }
+  },
+
+  //USER
+  getAllCongDoanByIdMaHang: async (idMaHang, page, limit) => {
+    const offset = (page - 1) * limit;
+
+    try {
+      let queryCount = `SELECT count(*) as total FROM pm_cong_doan WHERE
+      ma_san_pham = ?`;
+
+      let querySelect = `
+        SELECT stt, ten_cong_doan, video FROM pm_cong_doan where ma_san_pham = '${idMaHang}' ORDER BY stt LIMIT ${limit} OFFSET ${offset}
+      `;
+
+      // Lấy tổng số công đoạn
+      const [totalResult] = await db.query(queryCount, [idMaHang]);
+      const totalItems = totalResult[0].total;
+
+      // Lấy danh sách công đoạn với phân trang
+      const [congdoans] = await db.query(querySelect);
+
+      const totalPages = Math.ceil(totalItems / limit);
+
+      return {
+        congdoans,
+        totalPages,
+        totalItems,
+        limit,
+      };
+    } catch (error) {
+      console.error("Error in getAllNhanViens model:", error);
+      throw error;
     }
   },
 };

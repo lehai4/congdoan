@@ -1,7 +1,7 @@
 import {
+  EditOutlined,
   SearchOutlined,
   UploadOutlined,
-  EditOutlined,
 } from "@ant-design/icons";
 import {
   Button,
@@ -73,9 +73,37 @@ const HomePage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isType, setIsType] = useState(null);
-  const showModal = (data) => {
+
+  const showModal = async (data, type) => {
     setDataModal(data);
-    setIsModalOpen(true);
+
+    // console.log(type);
+    setIsType(type);
+    if (type === "edit") {
+      const res = await http.getAllCongDoan();
+      // console.log(res.data);
+      const existLink =
+        res &&
+        res.data &&
+        res.data.find(
+          (item) =>
+            item.ma_san_pham === data.ma_hang &&
+            item.ten_qui_trinh === data.quy_trinh &&
+            item.ma_cong_doan === data.ma_cong_doan
+        ).video;
+      // console.log(existLink);
+      setLink(existLink);
+      setIsModalOpen(true);
+    } else if (type === "add") {
+      setIsModalOpen(true);
+    }
+  };
+
+  const convertLink = (url) => {
+    const baseURL = "https://youtu.be/";
+    const videoID = url.replace(baseURL, "");
+
+    return "https://www.youtube.com/embed/" + videoID;
   };
 
   const handleAddLinkVideo = async () => {
@@ -86,7 +114,7 @@ const HomePage = () => {
     try {
       const data = {
         ...dataModal,
-        video: link,
+        video: convertLink(link),
       };
       const saveStore = {
         ma_cong_doan: dataModal.ma_cong_doan,
@@ -97,8 +125,7 @@ const HomePage = () => {
       const res = await http.uploadProcess(token, data);
       await http.addProcessIsSaveLink(token, saveStore);
       fetchAllProcessIsSaveLink();
-      handleShowAllProcess();
-
+      handleShowAllProcess(currentPage);
       toast.success(res.data.message);
       setIsModalOpen(false);
       setLink(null);
@@ -109,10 +136,32 @@ const HomePage = () => {
   };
 
   const handleEditLinkVideo = async () => {
-    console.log("Edit link video");
+    try {
+      const data = {
+        ...dataModal,
+        video: convertLink(link),
+      };
+      const saveStore = {
+        ma_cong_doan: dataModal.ma_cong_doan,
+        ma_hang: dataModal.ma_hang,
+        quy_trinh: dataModal.quy_trinh,
+        stt: dataModal.stt,
+      };
+      const res = await http.uploadProcess(token, data);
+      await http.addProcessIsSaveLink(token, saveStore);
+      fetchAllProcessIsSaveLink();
+      handleShowAllProcess(currentPage);
+      toast.success("Cập nhật thành công");
+      setIsModalOpen(false);
+      setLink(null);
+    } catch (err) {
+      toast.error(error.message);
+      console.log(error);
+    }
   };
 
   const handleCancel = () => {
+    setLink(null);
     setIsModalOpen(false);
   };
 
@@ -290,12 +339,11 @@ const HomePage = () => {
               item.ma_cong_doan === data.ma_cong_doan
           ) ? (
             <Button
-              type="dashed"
+              type="default"
               size="middle"
               icon={<EditOutlined />}
               onClick={() => {
-                setIsType("edit");
-                showModal(data);
+                showModal(data, "edit");
               }}
             >
               Edit Link
@@ -306,8 +354,7 @@ const HomePage = () => {
               size="middle"
               icon={<UploadOutlined />}
               onClick={() => {
-                setIsType("add");
-                showModal(data);
+                showModal(data, "add");
               }}
             >
               Thêm Link
@@ -334,7 +381,6 @@ const HomePage = () => {
 
   const fetchAllProcessIsSaveLink = async () => {
     const res = await http.getAllProcessIsSaveLink();
-    // console.log(res);
     setIsValidProcess(res.data);
   };
 
@@ -462,7 +508,7 @@ const HomePage = () => {
   }
 
   if (error) {
-    return <div>Error: {error.message}</div>;
+    return <div className="text-red-500">Error: {error.message}</div>;
   }
   return (
     <div className="flex flex-col h-full justify-center">
