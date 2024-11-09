@@ -1,4 +1,4 @@
-import { EyeOutlined, LoadingOutlined } from "@ant-design/icons";
+import { LoadingOutlined } from "@ant-design/icons";
 import {
   Button,
   Modal,
@@ -64,34 +64,22 @@ const UserPage = () => {
   const columns = [
     {
       key: "STT",
-      title: (
-        <Typography.Text className="text-[16px] whitespace-nowrap">
-          STT
-        </Typography.Text>
-      ),
+      title: <p className="text-[16px] whitespace-nowrap">STT</p>,
       dataIndex: "stt",
-      render: (stt) => (
-        <Typography.Text className="text-[16px]">{stt}</Typography.Text>
-      ),
+      width: 100,
+      render: (stt) => <p className="text-[16px]">{stt}</p>,
     },
     {
       key: "ten_cong_doan",
-      title: (
-        <Typography.Text className="text-[16px] whitespace-nowrap">
-          Tên công đoạn
-        </Typography.Text>
-      ),
+      title: <p className="text-[16px] whitespace-nowrap">Tên công đoạn</p>,
       dataIndex: "ten_cong_doan",
-      //   ...getColumnSearchProps("ten_cong_doan"),
       render: (ten_cong_doan) => (
-        <Typography.Text className="text-[16px]">
-          {ten_cong_doan}
-        </Typography.Text>
+        <p className="text-[16px] w-[350px] lg:w-[800px]">{ten_cong_doan}</p>
       ),
     },
     {
       key: "video",
-      title: <Typography.Text className="text-[16px]">Video</Typography.Text>,
+      title: <p className="text-[16px] whitespace-nowrap">Video</p>,
       dataIndex: "video",
       render: (video) => (
         <Button type="default" onClick={() => handleOpen(video)}>
@@ -169,6 +157,13 @@ const UserPage = () => {
     }
   };
 
+  const handleReload = () => {
+    if (query.ma_hang) {
+      handleGetAllCongDoanByIdMaHang();
+    } else {
+      fetchAllMaHang();
+    }
+  };
   useEffect(() => {
     const data = congDoans?.map((p, i) => {
       return {
@@ -210,6 +205,9 @@ const UserPage = () => {
   }
   return (
     <div className="flex flex-col h-full justify-center">
+      <div>
+        <Button onClick={handleReload}>Reload</Button>
+      </div>
       <h2 className="text-[32px] font-semibold">Danh sách công đoạn</h2>
       <div className="flex flex-row items-center justify-start">
         <form className="my-4 flex flex-row gap-5">
@@ -272,12 +270,6 @@ const UserPage = () => {
           height: "80vh",
         }}
       >
-        {/* <div
-          style={{
-            height: "100%",
-          }}
-        >
-        </div> */}
         <Video url={videoCongDoan} />
       </Modal>
     </div>

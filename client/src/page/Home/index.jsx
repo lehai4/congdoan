@@ -271,63 +271,43 @@ const HomePage = () => {
   const columns = [
     {
       key: "STT",
-      title: (
-        <Typography.Text className="text-[16px] whitespace-nowrap">
-          STT
-        </Typography.Text>
-      ),
+      title: <p className="text-[16px] whitespace-nowrap">STT</p>,
       dataIndex: "stt",
-      render: (stt) => (
-        <Typography.Text className="text-[16px]">{stt}</Typography.Text>
-      ),
+      render: (stt) => <p className="text-[16px]">{stt}</p>,
     },
     {
       key: "ma_hang",
       width: 120,
-      title: (
-        <Typography.Text className="text-[16px] whitespace-nowrap">
-          Tên mã hàng
-        </Typography.Text>
-      ),
+      title: <p className="text-[16px] whitespace-nowrap">Tên mã hàng</p>,
       dataIndex: "ma_hang",
       render: (ma_hang) => (
-        <Typography.Text className="text-[16px] flex justify-center items-center whitespace-nowrap">
+        <p className="text-[16px] flex justify-center items-center whitespace-nowrap">
           {ma_hang}
-        </Typography.Text>
+        </p>
       ),
     },
     {
       key: "ten_cong_doan",
-      title: (
-        <Typography.Text className="text-[16px] whitespace-nowrap">
-          Tên công đoạn
-        </Typography.Text>
-      ),
+      title: <p className="text-[16px] whitespace-nowrap">Tên công đoạn</p>,
       dataIndex: "ten_cong_doan",
       ...getColumnSearchProps("ten_cong_doan"),
       render: (ten_cong_doan) => (
-        <Typography.Text className="text-[16px]">
-          {ten_cong_doan}
-        </Typography.Text>
+        <p className="text-[16px] w-[350px] lg:w-[800px]">{ten_cong_doan}</p>
       ),
     },
     {
       key: "time",
       width: 100,
-      title: (
-        <Typography.Text className="text-[16px] whitespace-nowrap">
-          Thời gian
-        </Typography.Text>
-      ),
+      title: <p className="text-[16px] whitespace-nowrap">Thời gian</p>,
       dataIndex: "time",
       render: (time) => (
-        <Typography.Text className="text-[16px] flex justify-center items-center whitespace-nowrap">
+        <p className="text-[16px] flex justify-center items-center whitespace-nowrap">
           {time}
-        </Typography.Text>
+        </p>
       ),
     },
     {
-      title: <Typography.Text className="text-[16px]"></Typography.Text>,
+      title: <p className="text-[16px]"></p>,
       dataIndex: "",
       key: "x",
       render: (data) => (
